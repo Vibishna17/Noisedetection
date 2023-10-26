@@ -1,0 +1,105 @@
+
+#Creating noise to the image and saving the noisy images
+#It can be used to load many images by changing the name
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from google.colab.patches import cv2_imshow
+
+# Load your image
+image = cv2.imread('paris.png')
+
+def add_salt_and_pepper_noise(image, salt_prob, pepper_prob):
+    noisy_image = np.copy(image)
+    total_pixels = image.size
+    print("Total pixels",total_pixels)
+
+    # Add salt noise
+    num_salt = int(total_pixels * salt_prob)
+    salt_coords = [np.random.randint(0, i - 1, num_salt) for i in image.shape]
+    noisy_image[salt_coords[0], salt_coords[1], :] = 255
+
+    # Add pepper noise
+    num_pepper = int(total_pixels * pepper_prob)
+    pepper_coords = [np.random.randint(0, i - 1, num_pepper) for i in image.shape]
+    noisy_image[pepper_coords[0], pepper_coords[1], :] = 0
+
+    return noisy_image
+
+def add_speckle_noise(image, scale=6):
+    noisy_image = image + scale * np.random.randn(*image.shape)
+    noisy_image = np.clip(noisy_image, 0, 255).astype(np.uint8)
+    return noisy_image
+
+def add_gaussian_noise(image, mean=0, std=25):
+    noisy_image = image + np.random.normal(mean, std, image.shape)
+    noisy_image = np.clip(noisy_image, 0, 255).astype(np.uint8)
+    return noisy_image
+
+def add_poisson_noise(image, scale=4):
+    noisy_image = np.random.poisson(image * scale) / scale
+    noisy_image = np.clip(noisy_image, 0, 255).astype(np.uint8)
+    return noisy_image
+
+def add_random_noise(image, noise_range=(0, 30)):
+    noisy_image = image + np.random.randint(noise_range[0], noise_range[1], image.shape)
+    noisy_image = np.clip(noisy_image, 0, 255).astype(np.uint8)
+    return noisy_image
+
+# Add salt and pepper noise
+sp2= add_salt_and_pepper_noise(image, salt_prob=0.01, pepper_prob=0.01)
+
+# Add speckle noise (e.g., increase scale to 1 for more noticeable noise)
+spe2= add_speckle_noise(image, scale=50)
+
+
+# Add Gaussian noise
+g2 = add_gaussian_noise(image, mean=0, std=25)
+
+# Add Poisson noise (e.g., increase scale to 50 for more noticeable noise)
+p2 = add_poisson_noise(image, scale=0.01)
+
+
+# Add random noise
+r2 = add_random_noise(image, noise_range=(0, 60))
+
+# Plot original and noisy images
+plt.figure(figsize=(14,12))
+
+
+plt.subplot(1, 5,1 )
+plt.imshow(cv2.cvtColor(sp2, cv2.COLOR_BGR2RGB))
+plt.title('Image ')
+
+
+plt.subplot(1, 5, 2)
+plt.imshow(cv2.cvtColor(spe2, cv2.COLOR_BGR2RGB))
+plt.title('Image ')
+
+
+plt.subplot(1, 5,3)
+plt.imshow(cv2.cvtColor(g2, cv2.COLOR_BGR2RGB))
+plt.title('Image ')
+plt.subplot(1, 5,4 )
+plt.imshow(cv2.cvtColor(p2, cv2.COLOR_BGR2RGB))
+plt.title('Image 6')
+
+
+plt.subplot(1, 5, 5)
+plt.imshow(cv2.cvtColor(r2, cv2.COLOR_BGR2RGB))
+plt.title('Image 10')
+# Save image6 to a file
+cv2.imwrite('sp2.jpg', sp2)
+
+# Save image7 to a file
+cv2.imwrite('spe2.jpg', spe2)
+
+# Save image8 to a file
+cv2.imwrite('g2.jpg', g2)
+
+# Save image9 to a file
+cv2.imwrite('p2.jpg', p2)
+
+# Save image10 to a file
+cv2.imwrite('r2.jpg', r2)
+
